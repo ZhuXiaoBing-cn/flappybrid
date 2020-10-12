@@ -15,7 +15,6 @@ public class Bird {
     private static final int MOVEMENT = 100;
 
     private Vector3 position;
-
     private Vector3 velocity;
 
     private Texture bird;
