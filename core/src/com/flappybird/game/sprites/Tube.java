@@ -1,5 +1,7 @@
 package com.flappybird.game.sprites;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -19,7 +21,7 @@ public class Tube {
     public static final int TUBE_WIDTH = 52;
 
     private static final int FLUCTUATION = 130;
-    private static final int TUBE_GAP = 100;
+    private static final int TUBE_GAP = 120;
     private static final int LOWEST_OPENING = 120;
 
     private Texture topTube, bottomTube;
@@ -27,10 +29,12 @@ public class Tube {
     private Rectangle boundsTop,boundsBot;
     private Random random;
 
+
     public Tube(float x) {
 
         topTube = new Texture("toptube.png");
         bottomTube = new Texture("bottomtube.png");
+
         random = new Random();
 
         posTopTube = new Vector2(x, random.nextInt(FLUCTUATION) + TUBE_GAP + LOWEST_OPENING);
@@ -50,7 +54,15 @@ public class Tube {
     }
 
     public boolean collides(Rectangle player){
-        return player.overlaps(boundsTop) || player.overlaps(boundsBot);
+        if(player.overlaps(boundsTop) || player.overlaps(boundsBot)){
+            return true;
+        }
+        return false;
+    }
+
+    public void dispose(){
+        topTube.dispose();
+        bottomTube.dispose();
     }
 
     public Texture getTopTube() {
