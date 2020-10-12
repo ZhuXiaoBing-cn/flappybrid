@@ -71,21 +71,24 @@ public class PlayState extends State {
             }
 
             if (tube.collides(bird.getBounds())) {
-                hit.play(0.2f);
+                hit.play(0.1f);
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-//                System.out.println("小鸟: "+"x:" + bird.getBounds().x + "   y:" + bird.getBounds().y);
-//                System.out.println("上面管子: "+"x:" + tube.getPosTopTube().x+ "   y:" + tube.getPosTopTube().y);
-//                System.out.println("下面管子: "+"x:" + tube.getPosBotTube().x+ "   y:" + tube.getPosBotTube().y);
                 gsm.set(new PlayState(gsm));
                 break;
             }
         }
 
         if (bird.getPosition().y <= ground.getHeight() + GROUND_Y_OFFSET) {
+            hit.play(0.1f);
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             gsm.set(new PlayState(gsm));
         }
 
