@@ -41,11 +41,12 @@ public class PlayScreen extends ScreenAdapter {
     private Vector2 groundPos1, groundPos2;
 
     private Sound hit;
+    private static final int SCREEN_ID = 2;
 
     public PlayScreen(FlappyBirdGame flappyBirdGame) {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, FlappyBirdGame.WIDTH / 2, FlappyBirdGame.HEIGHT / 2);
-        bird = new Bird();
+        bird = new Bird(SCREEN_ID);
         tubes = new Array<>();
         bg = new Texture("bg.png");
         ground = new Texture("ground.png");

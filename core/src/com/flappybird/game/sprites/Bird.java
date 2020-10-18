@@ -25,7 +25,7 @@ public class Bird {
     /**
      * 鸟在Y方向上受到重力的影响
      */
-    private static final int GRAVITY = -15;
+    private int GRAVITY = 0;
     /**
      * 鸟在游戏中开始时X的位置
      */
@@ -44,12 +44,17 @@ public class Bird {
     private Array<Texture> array;
     private TextureAtlas atlas;
 
-    public Bird() {
+    public Bird(int currentScreenId) {
+        if (currentScreenId == 1) {
+            GRAVITY = 0;
+        } else if (currentScreenId == 2) {
+            GRAVITY = -15;
+        }
         posBird = new Vector2(BIRD_BEGIN_X, BIRD_BEGIN_Y);
         velocity = new Vector2(0, 0);
         array = new Array<>();
         atlas = new TextureAtlas("bird.atlas");
-        birdAnimation = new Animation<TextureRegion>(1/3f, atlas.findRegions("bird"), Animation.PlayMode.LOOP);
+        birdAnimation = new Animation<TextureRegion>(1 / 3f, atlas.findRegions("bird"), Animation.PlayMode.LOOP);
         wingsBeat = Gdx.audio.newSound(Gdx.files.internal("flap.ogg"));
         birdBounds = new Rectangle(posBird.x, posBird.y,
                 birdAnimation.getKeyFrame(birdAnimation.getFrameDuration()).getRegionWidth(),
@@ -57,7 +62,7 @@ public class Bird {
 
     }
 
-    public TextureRegion frame(float dt){
+    public TextureRegion frame(float dt) {
         frameSumTime += dt;
         return birdAnimation.getKeyFrame(frameSumTime);
     }
@@ -97,7 +102,7 @@ public class Bird {
 
     public void dispose() {
         wingsBeat.dispose();
-        for(Texture texture : array){
+        for (Texture texture : array) {
             texture.dispose();
         }
     }
