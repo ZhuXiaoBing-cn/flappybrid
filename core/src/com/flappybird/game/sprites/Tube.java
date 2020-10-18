@@ -2,6 +2,7 @@ package com.flappybird.game.sprites;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -18,51 +19,65 @@ import java.util.Random;
  */
 public class Tube {
 
-    public static final int TUBE_WIDTH = 52;
+    private static final int FLUCTUATION = 120;
+    /**
+     * 管子最低高度
+     */
+    private static final int LOW_LIMIT = 60;
+    /**
+     * 上下管子中间的间隔
+     */
+    private static final int TOP_BOTTOM_GAP = 120;
 
-    private static final int FLUCTUATION = 130;
-    private static final int TUBE_GAP = 120;
-    private static final int LOWEST_OPENING = 120;
 
     private Texture topTube, bottomTube;
-    private Vector2 posTopTube, posBotTube;
-    private Rectangle boundsTop,boundsBot;
+    private Vector2 posTopTube, posBottomTube;
+    private Rectangle topBounds, botBounds;
+    /**
+     * 随机数是用于生成水管的高度
+     */
     private Random random;
 
-
     public Tube(float x) {
+        random = new Random();
 
         topTube = new Texture("toptube.png");
         bottomTube = new Texture("bottomtube.png");
 
-        random = new Random();
+        posTopTube = new Vector2(x, random.nextInt(FLUCTUATION) + TOP_BOTTOM_GAP + LOW_LIMIT);
+        posBottomTube = new Vector2(x, posTopTube.y - TOP_BOTTOM_GAP - bottomTube.getHeight());
 
-        posTopTube = new Vector2(x, random.nextInt(FLUCTUATION) + TUBE_GAP + LOWEST_OPENING);
-        posBotTube = new Vector2(x, posTopTube.y - TUBE_GAP - bottomTube.getHeight());
-
-        boundsTop = new Rectangle(posTopTube.x,posTopTube.y,topTube.getWidth(),topTube.getHeight());
-        boundsBot = new Rectangle(posBotTube.x,posBotTube.y,bottomTube.getWidth(),bottomTube.getHeight());
+        topBounds = new Rectangle(posTopTube.x, posTopTube.y, topTube.getWidth(), topTube.getHeight());
+        botBounds = new Rectangle(posBottomTube.x, posBottomTube.y, bottomTube.getWidth(), bottomTube.getHeight());
 
     }
 
-    public void reposition(float x) {
-        posTopTube.set(x, random.nextInt(FLUCTUATION) + TUBE_GAP + LOWEST_OPENING);
-        posBotTube.set(x, posTopTube.y - TUBE_GAP - bottomTube.getHeight());
-        boundsTop.setPosition(posTopTube.x,posTopTube.y);
-        boundsBot.setPosition(posBotTube.x,posBotTube.y);
-
-    }
-
-    public boolean collides(Rectangle player){
-        if(player.overlaps(boundsTop) || player.overlaps(boundsBot)){
+    public boolean collides(Rectangle birdBounds) {
+        if (birdBounds.overlaps(topBounds) || birdBounds.overlaps(botBounds)) {
             return true;
         }
         return false;
     }
 
-    public void dispose(){
+    public void reposition(float x) {
+        posTopTube = new Vector2(x, random.nextInt(FLUCTUATION) + TOP_BOTTOM_GAP + LOW_LIMIT);
+        posBottomTube = new Vector2(x, posTopTube.y - TOP_BOTTOM_GAP - bottomTube.getHeight());
+
+        topBounds = new Rectangle(posTopTube.x, posTopTube.y, topTube.getWidth(), topTube.getHeight());
+        botBounds = new Rectangle(posBottomTube.x, posBottomTube.y, bottomTube.getWidth(), bottomTube.getHeight());
+    }
+
+    public void dispsoe() {
         topTube.dispose();
         bottomTube.dispose();
+    }
+
+    public Vector2 getPosTopTube() {
+        return posTopTube;
+    }
+
+    public Vector2 getPosBottomTube() {
+        return posBottomTube;
     }
 
     public Texture getTopTube() {
@@ -71,13 +86,5 @@ public class Tube {
 
     public Texture getBottomTube() {
         return bottomTube;
-    }
-
-    public Vector2 getPosTopTube() {
-        return posTopTube;
-    }
-
-    public Vector2 getPosBotTube() {
-        return posBotTube;
     }
 }

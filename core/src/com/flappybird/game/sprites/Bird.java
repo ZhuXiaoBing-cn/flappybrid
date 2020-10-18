@@ -3,9 +3,13 @@ package com.flappybird.game.sprites;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.flappybird.game.FlappyBirdGame;
+import com.badlogic.gdx.graphics.g2d.Animation;
 
 /**
  * @Classname Bird
@@ -14,64 +18,95 @@ import com.badlogic.gdx.math.Vector3;
  * @Author by ZhuXiaoBing
  */
 public class Bird {
-
+    /**
+     * 鸟在X方向上的移动速度
+     */
+    private static final int MOVE_X = 100;
+    /**
+     * 鸟在Y方向上受到重力的影响
+     */
     private static final int GRAVITY = -15;
-    private static final int MOVEMENT = 100;
+    /**
+     * 鸟在游戏中开始时X的位置
+     */
+    private static final int BIRD_BEGIN_X = 50;
+    /**
+     * 鸟在游戏中开始时Y的位置
+     */
+    private static final int BIRD_BEGIN_Y = 150;
 
-    private Vector3 position;
-    private Vector3 velocity;
-    private Rectangle bounds;
-    private Texture birdCombination;
-//    private Texture bird;
-    private Animation birdAnimation;
-    private Sound flag;
+    private float frameSumTime;
+    private Sound wingsBeat;
+    private Vector2 posBird;
+    private Vector2 velocity;
+    private Rectangle birdBounds;
+    private Animation<TextureRegion> birdAnimation;
+    private Array<Texture> array;
+    private TextureAtlas atlas;
 
-    public Bird(float x, float y) {
-        position = new Vector3(x, y, 0);
-        velocity = new Vector3(0, 0, 0);
-//        bird = new Texture("bird.png");
-        birdCombination = new Texture("birdanimation.png");
-        flag = Gdx.audio.newSound(Gdx.files.internal("flap.ogg"));
-        birdAnimation = new Animation(new TextureRegion(birdCombination), 3, 0.5f);
-        bounds = new Rectangle(x, y, birdCombination.getWidth() / 3, birdCombination.getHeight());
+    public Bird() {
+        posBird = new Vector2(BIRD_BEGIN_X, BIRD_BEGIN_Y);
+        velocity = new Vector2(0, 0);
+        array = new Array<>();
+        atlas = new TextureAtlas("bird.atlas");
+        birdAnimation = new Animation<TextureRegion>(1/3f, atlas.findRegions("bird"), Animation.PlayMode.LOOP);
+        wingsBeat = Gdx.audio.newSound(Gdx.files.internal("flap.ogg"));
+        birdBounds = new Rectangle(posBird.x, posBird.y,
+                birdAnimation.getKeyFrame(birdAnimation.getFrameDuration()).getRegionWidth(),
+                birdAnimation.getKeyFrame(birdAnimation.getFrameDuration()).getRegionHeight());
+
     }
 
-    public void update(float dt) {
-        birdAnimation.update(dt);
-        if (position.y > 0) {
-            velocity.add(0, GRAVITY, 0);
-        }
-        velocity.scl(dt);
+    public TextureRegion frame(float dt){
+        frameSumTime += dt;
+        return birdAnimation.getKeyFrame(frameSumTime);
+    }
 
-        position.add(MOVEMENT * dt, velocity.y, 0);
-        if (position.y <= 0) {
-            position.y = 0;
-        }
-        velocity.scl(1 / dt);
 
-        bounds.setPosition(position.x, position.y);
+    /**
+     * 鸟的移动方法
+     */
+    public void move(float dt) {
+
+        if (posBird.y > 0) {
+            velocity.add(0, GRAVITY);
+        }
+
+        velocity.scl(dt);//dt小于1，velocity减小
+        posBird.add(MOVE_X * dt, velocity.y);
+        if (posBird.y <= 25) {
+            posBird.y = 25;
+        }
+
+        velocity.scl(1 / dt);//dt大于1,增大
+        birdBounds.setPosition(posBird.x, posBird.y);
+    }
+
+    /**
+     * 鸟扇动翅膀方法
+     */
+    public void flap() {
+        velocity.y = 250;
+        wingsBeat.play(0.1f);
+    }
+
+
+    public Vector2 getPosBird() {
+        return posBird;
     }
 
     public void dispose() {
-        birdCombination.dispose();
-        flag.dispose();
+        wingsBeat.dispose();
+        for(Texture texture : array){
+            texture.dispose();
+        }
     }
 
-    public void jump() {
-        velocity.y = 250;
-        flag.play(0.2f);
+    public Rectangle getBirdBounds() {
+        return birdBounds;
     }
 
-    public Rectangle getBounds() {
-        return bounds;
-    }
-
-    public Vector3 getPosition() {
-        return position;
-    }
-
-    public TextureRegion getBird() {
-//        return bird;
-        return birdAnimation.getFrame();
+    public Animation<TextureRegion> getBirdAnimation() {
+        return birdAnimation;
     }
 }
